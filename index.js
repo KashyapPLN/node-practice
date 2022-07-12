@@ -117,7 +117,7 @@ app.get('/movies/:id', async function (req, res) {
   // const movie =movies.find((mv)=>mv.id===id);
   // res.send(movie);
 
-const movie= await client.db("guvi").collection("movies").findOne({id:"101"})
+const movie= await client.db("guvi").collection("movies").findOne({id:"102"})
 
   movie ? res.send(movie) : res.status(404).send({msg:"Movie not found"});
 })
