@@ -1,5 +1,6 @@
 import express, { response } from "express";
 import { MongoClient } from "mongodb";
+import {moviesRouter} from "./routes/movies.js"
 import dotenv from "dotenv";
 dotenv.config();
 const app = express();
@@ -14,7 +15,7 @@ async function createConnection() {
   return client;
 }
 
-const client = await createConnection();
+export const client = await createConnection();
 
 
 const movies = [
@@ -100,53 +101,7 @@ const movies = [
   app.get('/', function (req, res) {
     res.send("Hello World")})
 
-app.get('/movies', async function (req, res) {
-  if(req.query.rating){
-    req.query.rating=+req.query.rating;
-  }
-  console.log(req.query);
-  const movies = await client.db("guvi").collection("movies").find(req.query).toArray(); 
-
-  // console.log("Movies :"+movies);
-  res.send(movies);
-})
-app.get('/movies/:id', async function (req, res) {
-  const {id} = req.params;
-  
-  console.log(req.params,id)
-  // const movie =movies.find((mv)=>mv.id===id);
-  // res.send(movie);
-
-const movie= await client.db("guvi").collection("movies").findOne({id:"102"})
-
-  movie ? res.send(movie) : res.status(404).send({msg:"Movie not found"});
-})
-
-app.post('/movies', async function (req, res) {
-  const data= req.body;
-console.log(data);
-const result = await client.db("guvi").collection("movies").insertMany(data);
-  res.send(result);})
-  
-  app.delete('/movies/:id', async function (req, res) {
-    const {id} = req.params;
-    
-    console.log(req.params,id)
-
-  const movie= await client.db("guvi").collection("movies").deleteOne({id:"101"})
-  
-    movie.deletedCount>0 ? res.send(movie) : res.status(404).send({msg:"Movie not found"});
-  })
-
-  app.put('/movies/:id', async function (req, res) {
-    const {id} = req.params;
-    console.log(req.params,id)
-    const data=req.body;
-
-    const result = await client.db("guvi").collection("movies").updateOne({id:id},{$set:data});
-  res.send(result);
-    
-  })
+app.use("/movies",moviesRouter)
 
 
 app.listen(PORT,()=>console.log(`Port changed to ${PORT}`))
